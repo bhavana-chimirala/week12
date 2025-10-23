@@ -1,48 +1,32 @@
 pipeline {
     agent any
-   
     stages {
-
         stage('Run Selenium Tests with pytest') {
             steps {
-                    echo "Running Selenium Tests using pytest"
-
-                    // Install Python dependencies
-                    bat 'pip install -r requirements.txt'
-
-                    //  Start Flask app in background
-                    bat 'start /B python app.py'
-
-                    // Wait a few seconds for the server to start
-                    bat 'ping 127.0.0.1 -n 5 > nul'
-
-                    // Run tests using pytest
-                    
-                    bat 'pytest -v'
+                    echo "Running Selenium Tests using pytest" 
+                    bat 'python -m pip install -r requirements.txt' 
+                    bat 'start /B python app.py' 
+                    bat 'ping 127.0.0.1 -n 5 > nul' 
+                    bat 'python -m pytest -v'
             }
         }
-
         stage('Build Docker Image') {
             steps {
                 echo "Build Docker Image"
-                bat "docker build -t week12:v1 ."
+                bat "docker build -t seleniumdemoapp:v1 ."
             }
         }
         stage('Docker Login') {
             steps {
-                withCredentials([usernamePassword(credentialsId: 'dockerhub_creds', usernameVariable: 'DOCKER_USER', passwordVariable: 'DOCKER_PASS')]) {
-                    bat '''
-                        docker login -u %DOCKER_USER% -p %DOCKER_PASS%
-                    '''
+                 bat 'docker login -u bhavanachimirala -p Bhavana@123'
                 }
             }
-        }
         stage('push Docker Image to Docker Hub') {
             steps {
                 echo "push Docker Image to Docker Hub"
-                bat "docker tag week12:v1 bhavanachimirala/week12:v1"               
+                bat "docker tag seleniumdemoapp:v1 bhavanachimirala/seleniumjavascript:seleniumtestimage"               
                     
-                bat "docker push bhavanachimirala/week12:v1"
+                bat "docker push bhavanachimirala/seleniumjavascript:seleniumtestimage"
                 
             }
         }
@@ -63,3 +47,4 @@ pipeline {
         }
     }
 }
+
